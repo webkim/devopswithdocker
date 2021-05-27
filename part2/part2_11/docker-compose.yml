@@ -1,0 +1,36 @@
+version: "3.7"
+
+services:
+
+    api:
+        image: fastapi_api
+        container_name: api
+        build:
+            context: .
+            dockerfile: ./docker/Dockerfile
+        volumes:
+            - ./app:/app
+        ports:
+            - 80:80
+        #this enables hot reload
+        command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--debug", "--port", "80", "--reload-dir", "/app"]
+        networks:
+            - backend-network
+        depends_on: 
+            - postgres
+
+    postgres:
+        image: postgres:13.3
+        restart: unless-stopped
+        environment:
+            POSTGRES_PASSWORD: P@ssW0rd
+        networks:
+            - backend-network
+        volumes:
+            - ./database:/var/lib/postgresql/data
+networks:
+    backend-network:
+
+volumes:
+    app:
+    database:

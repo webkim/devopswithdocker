@@ -1,0 +1,45 @@
+version: "3.7"
+
+services:
+    frontend:
+        image: frontend
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile
+        ports:
+            - 5000:5000
+
+    backend:
+        image: backend
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        ports:
+            - 8081:8000
+        networks:
+            - cache-network
+            - database-network
+        environment:
+            - REDIS_HOST=redis
+            - POSTGRES_HOST=postgres
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=P@ssW0rd
+            - POSTGRES_DATABASE=postgres
+            
+    postgres:
+        image: postgres:13.3
+        restart: unless-stopped
+        environment:
+            POSTGRES_PASSWORD: P@ssW0rd
+        networks:
+            - database-network
+        
+    redis:
+        image: redis:6.2.3
+        networks:
+            - cache-network
+networks:
+    cache-network:
+        name: cache-network
+    database-network:
+        name: database-network
